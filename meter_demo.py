@@ -3,6 +3,8 @@
 import firmata
 import time
 
+from linux_metrics import cpu_stat
+
 PIN_BUTTON = 11
 PIN_LED = 10
 PIN_METER = 9
@@ -14,20 +16,7 @@ board.pinMode(PIN_BUTTON, firmata.MODE_INPUT)
 board.digitalWrite(PIN_BUTTON, True)
 board.EnableDigitalReporting(1)  # Enable digital reporting on port 1
 
-i = 0
-d = 1
-
 while(True):
-  if(d):
-    i += 1
-  else:
-    i -= 1
-
-  if(i<1):
-    d = 1
-  if(i>254):
-    d = 0
-
-  board.analogWrite(PIN_LED, i)
+  cpu_pcts = cpu_stat.cpu_percents(1)
+  i = int((100 - cpu_pcts['idle']) * 2.55)
   board.analogWrite(PIN_METER, i)
-  time.sleep(0.01)
